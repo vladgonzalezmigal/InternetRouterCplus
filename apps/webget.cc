@@ -9,8 +9,16 @@ using namespace std;
 
 void get_URL( const string& host, const string& path )
 {
-  cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
-  cerr << "Warning: get_URL() has not been implemented yet.\n";
+   TCPSocket mySocket;
+   const Address myAdress(host,"http");
+   mySocket.connect(myAdress);
+   string newBuf = "GET "+path+" HTTP/1.1\r\n"+"Host: "+host+"\r\n"+"Connection: close\r\n\r\n";
+   mySocket.write(newBuf);
+   while (mySocket.eof() == false){ 
+     mySocket.read(newBuf);
+     cout << newBuf;
+   }
+   mySocket.close();
 }
 
 int main( int argc, char* argv[] )
@@ -34,7 +42,7 @@ int main( int argc, char* argv[] )
     // Get the command-line arguments.
     const string host { args[1] };
     const string path { args[2] };
-
+     
     // Call the student-written function.
     get_URL( host, path );
   } catch ( const exception& e ) {
