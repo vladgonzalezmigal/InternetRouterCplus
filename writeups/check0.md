@@ -5,23 +5,18 @@ My name: [vladimir gonzalez migal]
 
 My SUNet ID: [vladgm24]
 
-I collaborated with: [list sunetids here]
+I collaborated with: []
 
-I would like to credit/thank these classmates for their help: [list sunetids here]
+I would like to credit/thank these classmates for their help: [siwooahn]
 
-This lab took me about [n] hours to do. I [did/did not] attend the lab session.
+This lab took me about [7] hours to do. I [did] attend the lab session.
 
-My secret code from section 2.1 was: [code here]
+My secret code from section 2.1 was: [289645]
 
-I was surprised by or edified to learn that: [describe]
+I was surprised by or edified to learn that: [the bytestream can be represented using a string]
 
-Describe ByteStream implementation. [Describe data structures and
-approach taken. Describe alternative designs considered or tested.
-Describe benefits and weaknesses of your design compared with
-alternatives -- perhaps in terms of simplicity/complexity, risk of
-bugs, asymptotic performance, empirical performance, required
-implementation time and difficulty, and other factors. Include any
-measurements if applicable.]
+Describe ByteStream implementation. [
+I used a string to represent the bytestream buffer, and unsigned longs to represent the cumulative totals of bytes pushed and popped. Every new piece of data pushed got concatened to the end of the existing buffer and I popped off characters in a first in first out matter. I could have alternatively implemented the buffer as a queue of chars, which would have had the advantage of improved efficiency when appending since I would not need to copy the existing string like I need to do in concatenation. However, a benefit of my approach is the implementation time since the data that comes in is already a string. Another alternative design choice I could have made is a LIFO queue instead of my FIFO queue. However, in this scenario I think the advantage of a FIFO queue is that the reader will most likely care about the beginning characters when they are not able to read the entire buffer.  
 
 - Optional: I had unexpected difficulty with: [describe]
 

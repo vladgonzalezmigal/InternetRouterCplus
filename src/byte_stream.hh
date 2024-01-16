@@ -24,6 +24,10 @@ public:
 protected:
   // Please add any additional state to the ByteStream here, and not to the Writer and Reader interfaces.
   uint64_t capacity_;
+  std::string buffer = "";
+  bool closed = false;
+  unsigned long long int cumPushed = 0; // cumulative pushed bytes
+  unsigned long long int cumPopped = 0; // cumulative popped bytes
   bool error_ {};
 };
 
