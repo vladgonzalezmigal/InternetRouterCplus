@@ -12,20 +12,21 @@ bool Writer::is_closed() const
 
 void Writer::push( string data )
 {
-  if (closed) return;
-  if (data.length() <= available_capacity()){
+  if ( closed )
+    return;
+  if ( data.length() <= available_capacity() ) {
     cumPushed += data.length();
     buffer += data;
   } else {
     cumPushed += available_capacity();
-    buffer += data.substr(0,available_capacity());
+    buffer += data.substr( 0, available_capacity() );
   }
   return;
 }
 
 void Writer::close()
 {
-  closed = true;  
+  closed = true;
 }
 
 uint64_t Writer::available_capacity() const
@@ -41,7 +42,7 @@ uint64_t Writer::bytes_pushed() const
 bool Reader::is_finished() const
 {
   // Need check for edge case where capacity = 0?
-  return closed && (buffer.length() == 0);
+  return closed && ( buffer.length() == 0 );
 }
 
 uint64_t Reader::bytes_popped() const
@@ -51,18 +52,18 @@ uint64_t Reader::bytes_popped() const
 
 string_view Reader::peek() const
 {
-  return string_view(buffer);
+  return string_view( buffer );
 }
 
 void Reader::pop( uint64_t len )
 {
-  // need exception here 
-  if (len <= bytes_buffered()){
-    buffer.erase(buffer.begin(), buffer.begin() + len);
+  // need exception here
+  if ( len <= bytes_buffered() ) {
+    buffer.erase( buffer.begin(), buffer.begin() + len );
     cumPopped += len;
   } else {
     set_error();
-    throw std::invalid_argument("trying to pop more than buffer length");
+    throw std::invalid_argument( "trying to pop more than buffer length" );
     has_error();
   }
 }
