@@ -42,4 +42,8 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+  uint64_t cur_index = reader().bytes_popped();
+  uint64_t max_index = cur_index + reader().bytes_buffered() + writer().available_capacity();
+  std::string unassembled_buf = "";
+  std::string string_bmap = "";
 };

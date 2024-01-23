@@ -1,31 +1,27 @@
 Checkpoint 1 Writeup
 ====================
 
-My name: [your name here]
+My name: [Vladimir Gonzalez Migal]
 
-My SUNet ID: [your sunetid here]
+My SUNet ID: [vladgm24]
 
-I collaborated with: [list sunetids here]
+I collaborated with: []
 
-I would like to thank/reward these classmates for their help: [list sunetids here]
+I would like to thank/reward these classmates for their help: [siwooahn, moserj]
 
-This lab took me about [n] hours to do. I [did/did not] attend the lab session.
+This lab took me about [7] hours to do. I [did] attend the lab session.
 
-I was surprised by or edified to learn that: [describe]
+I was surprised by or edified to learn that: [I could use a string as a data structure]
 
-Describe Reassembler structure and design. [Describe data structures and
-approach taken. Describe alternative designs considered or tested.
-Describe benefits and weaknesses of your design compared with
-alternatives -- perhaps in terms of simplicity/complexity, risk of
-bugs, asymptotic performance, empirical performance, required
-implementation time and difficulty, and other factors. Include any
-measurements if applicable.]
+Describe Reassembler structure and design. I used as string for my data structure. I kept an
+extra binary string to track which bytes had been written and which ones have not. I did not finish
+my implementation. 
 
 Implementation Challenges:
 []
 
 Remaining Bugs:
-[]
+[not able to pass all tests]
 
 - Optional: I had unexpected difficulty with: [describe]
 
