@@ -6,43 +6,53 @@ using namespace std;
 #define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring )
-{
-  cout << "at start buf is " << unassembled_buf << "with length " << unassembled_buf.length() << "\n" << endl;
-  long unsigned int max_indx = cur_index + writer().available_capacity();
-  if ( max_indx > cur_index + unassembled_buf.length() ) { // if need to read white space
-    unassembled_buf += std::string( ( max_indx - unassembled_buf.length() ), ' ' );
-    string_bmap += std::string( ( max_indx - string_bmap.length() ), '0' );
+{ 
+  long unsigned int max_indx = cur_index + writer().available_capacity(); 
+  if ( max_indx > cur_index + unassembled_buf.length() ) { // add white space to buffer
+    unassembled_buf += std::string( ( max_indx - (cur_index + unassembled_buf.length())  ), ' ' );
+    string_bmap += std::string( ( max_indx - (cur_index + string_bmap.length())  ), '0' );
   }
+  if (first_index < cur_index && (first_index + data.length() ) > cur_index ){   // push data to current index 
+    data = data.substr((cur_index - first_index)); 
+    first_index = cur_index;
+  }
+  if (is_last_substring) {last_indx = first_index + data.length();} 
 
-  if ( first_index == cur_index ) {
+  if ( first_index == cur_index && first_index < max_indx) { // add next bytes in the stream
     cur_index = first_index + min( data.length(), writer().available_capacity() );
-    unassembled_buf = unassembled_buf.substr( cur_index );
-    string_bmap = string_bmap.substr( cur_index );
-
+    unassembled_buf.erase(0,  min( data.length(), writer().available_capacity() ) );
+    string_bmap.erase(0,  min( data.length(), writer().available_capacity() ) );
+  
     int count = 0;
-    for ( char c : string_bmap ) {
+    for ( char c : string_bmap ) { 
       if ( c == '1' ) {
-        data += unassembled_buf[count];
+        cur_index++;
         count++;
       } else {
         break;
       }
     }
-    unassembled_buf = unassembled_buf.substr( count );
-    string_bmap = string_bmap.substr( count );
+
+    data += unassembled_buf.substr(0,count);
+    unassembled_buf.erase(0,count);
+    string_bmap.erase(0,count );
     output_.writer().push( data );
-  }
-  // add stuff to buffer
-  else if ( first_index > cur_index && first_index < ( cur_index + writer().available_capacity() ) ) {
+
+  } else if ( first_index > cur_index && first_index < ( cur_index + writer().available_capacity() ) ) { // add bytes to buffer
     long unsigned int start_inx = first_index - cur_index;
-    if ( start_inx + data.length() > max_indx ) { // if the string is 2 long clip it
-      data = data.substr( 0, max_indx - start_inx );
+    if ( start_inx + data.length() > max_indx ) { // if the string is too long clip it
+      data = data.substr( 0, (max_indx - start_inx));
     }
     unassembled_buf = unassembled_buf.replace( start_inx, data.length(), data );
     string_bmap = string_bmap.replace( start_inx, data.length(), std::string( data.length(), '1' ) );
   }
-  if ( is_last_substring ) {
-    output_.writer().close();
+
+  if (last_indx || is_last_substring) {
+    if (is_last_substring && data.length() <= writer().available_capacity() && last_indx == cur_index){
+      output_.writer().close();
+    } else if (last_indx == cur_index){
+      output_.writer().close();
+    }
   };
 }
 

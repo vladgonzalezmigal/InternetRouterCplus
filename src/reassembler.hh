@@ -46,4 +46,5 @@ private:
   uint64_t max_index = cur_index + reader().bytes_buffered() + writer().available_capacity();
   std::string unassembled_buf = "";
   std::string string_bmap = "";
+  uint64_t last_indx = 0; 
 };
