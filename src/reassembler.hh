@@ -46,5 +46,5 @@ private:
   long unsigned int max_index = 0;
   std::string unassembled_buf = "";
   std::string string_bmap = "";
-  uint64_t last_indx = 0; 
+  uint64_t last_indx = 0;
 };
