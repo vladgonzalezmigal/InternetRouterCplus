@@ -1,29 +1,30 @@
 Checkpoint 2 Writeup
 ====================
 
-My name: [your name here]
+My name: [Vladimir Gonzalez Migal]
 
-My SUNet ID: [your sunetid here]
+My SUNet ID: [vladgm24]
 
-I collaborated with: [list sunetids here]
+I collaborated with: []
 
-I would like to thank/reward these classmates for their help: [list sunetids here]
+I would like to thank/reward these classmates for their help: [jshen7, siwoohn]
 
-This lab took me about [n] hours to do. I [did/did not] attend the lab session.
+This lab took me about [8] hours to do. I [did] attend the lab session.
 
-Describe Wrap32 and TCPReceiver structure and design. [Describe data
-structures and approach taken. Describe alternative designs considered
-or tested.  Describe benefits and weaknesses of your design compared
-with alternatives -- perhaps in terms of simplicity/complexity, risk
-of bugs, asymptotic performance, empirical performance, required
-implementation time and difficulty, and other factors. Include any
-measurements if applicable.]
+Describe Wrap32 and TCPReceiver structure and design. [ For wrap32 in my 
+unwrap function my approach was to find the two possible 'candidate' positions 
+for the raw value and add or subtract the distance for whichever candidate
+was smaller. However, in some cases it was only possible to add because subtracting
+would imply going below the zero point. For my tcp receiver I used a std::optional wrap32 to keep track of the ISN. Once the ISN was set then I called insert with the payload data, using the number of bytes pushed to the bystream as my checkpoint (the first unassembled index in my reassebmler). I made sure to convert the sequence number in my insert call to a byte stream index, keeping in consideration whether or not 
+the SYN flag was set. An alternative approach could have been using a wrap32 and a boolean
+to check if the ISN had been set or not. By using an optional wrap32 I was able to save the 
+need for an instance variable, but on the flip side I added a little bit of increased complexity.]
 
 Implementation Challenges:
-[]
+[unwrap function was tricky]
 
 Remaining Bugs:
-[]
+[none]
 
 - Optional: I had unexpected difficulty with: [describe]
 
