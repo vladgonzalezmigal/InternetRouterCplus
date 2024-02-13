@@ -43,7 +43,6 @@ public:
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
   uint64_t cur_index = reader().bytes_popped();
-  long unsigned int max_index = 0;
   std::string unassembled_buf = "";
   std::string string_bmap = "";
   uint64_t last_indx = 0;

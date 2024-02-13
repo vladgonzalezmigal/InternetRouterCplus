@@ -1,13 +1,12 @@
 #include "reassembler.hh"
+#include <algorithm>
 #include <iostream>
 
 using namespace std;
 
-#define min( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
-
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring )
 {
-  max_index = cur_index + writer().available_capacity();
+  long unsigned int max_index = cur_index + writer().available_capacity();
   if ( max_index > cur_index + unassembled_buf.length() ) { // add white space to buffer
     unassembled_buf += std::string( ( max_index - ( cur_index + unassembled_buf.length() ) ), ' ' );
     string_bmap += std::string( ( max_index - ( cur_index + string_bmap.length() ) ), '0' );
@@ -22,18 +21,14 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   }
 
   if ( first_index == cur_index && first_index < max_index ) { // add next bytes in the stream
-    cur_index = first_index + min( data.length(), writer().available_capacity() );
-    unassembled_buf.erase( 0, min( data.length(), writer().available_capacity() ) );
-    string_bmap.erase( 0, min( data.length(), writer().available_capacity() ) );
+    cur_index = first_index + std::min( data.length(), writer().available_capacity() );
+    unassembled_buf.erase( 0, std::min( data.length(), writer().available_capacity() ) );
+    string_bmap.erase( 0, std::min( data.length(), writer().available_capacity() ) );
 
-    int count = 0;
-    for ( char c : string_bmap ) {
-      if ( c == '1' ) {
-        cur_index++;
-        count++;
-      } else {
-        break;
-      }
+    unsigned long count = 0;
+    while (string_bmap[count] != '0' && count < string_bmap.length()){
+      cur_index++;
+      count++;
     }
 
     data += unassembled_buf.substr( 0, count );
@@ -41,8 +36,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     string_bmap.erase( 0, count );
     output_.writer().push( data );
 
-  } else if ( first_index > cur_index
-              && first_index < ( cur_index + writer().available_capacity() ) ) { // add bytes to buffer
+  } else if ( (first_index > cur_index) && (first_index < max_index) ) { // add bytes to buffer
     long unsigned int start_inx = first_index - cur_index;
     if ( start_inx + data.length() > max_index ) { // if the string is too long clip the end
       data.erase( ( max_index - start_inx ) );
