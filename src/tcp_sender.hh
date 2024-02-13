@@ -48,4 +48,10 @@ private:
   ByteStream input_;
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
+  uint16_t window_size = 1; 
+  uint64_t abs_seqno = 0; 
+  std::optional<uint64_t> timer = {};
+  uint64_t num_retransmissions = 0; 
+  uint64_t cur_RTO = initial_RTO_ms_;
+  std::queue<TCPSenderMessage> outstanding_segs {};
 };

@@ -5,7 +5,10 @@ using namespace std;
 
 void TCPReceiver::receive( TCPSenderMessage message )
 {
-  message.RST ? reader().set_error() : void();
+  if (message.RST){
+    reader().set_error();
+    return;
+  }
   if ( message.SYN ) {
     ISN = message.seqno;
   }
