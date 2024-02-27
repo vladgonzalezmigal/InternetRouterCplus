@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <map>
 
 #include "address.hh"
 #include "ethernet_frame.hh"
@@ -81,4 +82,6 @@ private:
 
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
+
+  std::map<Address,EthernetAddress> mapping {};
 };

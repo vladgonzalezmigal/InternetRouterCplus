@@ -1,13 +1,13 @@
 Checkpoint 5 Writeup
 ====================
 
-My name: [your name here]
+My name: [vladimir gonzalez migal]
 
-My SUNet ID: [your sunetid here]
+My SUNet ID: [vladgm24]
 
 I collaborated with: [list sunetids here]
 
-I would like to thank/reward these classmates for their help: [list sunetids here]
+I would like to thank/reward these classmates for their help: [moserj]
 
 This checkpoint took me about [n] hours to do. I [did/did not] attend the lab session.
 

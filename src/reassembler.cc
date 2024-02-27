@@ -7,7 +7,7 @@ using namespace std;
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring )
 {
   long unsigned int max_index = cur_index + writer().available_capacity();
-  if ( max_index > cur_index + unassembled_buf.length() ) { // add white space to buffer
+  if ( max_index > cur_index + unassembled_buf.length() ) { // need to change this
     unassembled_buf += std::string( ( max_index - ( cur_index + unassembled_buf.length() ) ), ' ' ); // can remove these lines with resize
     string_bmap += std::string( ( max_index - ( cur_index + string_bmap.length() ) ), '0' );
   }
