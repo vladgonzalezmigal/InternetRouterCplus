@@ -28,6 +28,7 @@
 // the network interface passes it up the stack. If it's an ARP
 // request or reply, the network interface processes the frame
 // and learns or replies as necessary.
+
 class NetworkInterface
 {
 public:
@@ -68,6 +69,11 @@ public:
 
 private:
   // Human-readable name of the interface
+  struct eaddrtime {
+    int time;
+    EthernetAddress eaddr;
+  };
+
   std::string name_;
 
   // The physical output port (+ a helper function `transmit` that uses it to send an Ethernet frame)
@@ -83,5 +89,10 @@ private:
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
 
-  std::map<Address,EthernetAddress> mapping {};
+  // std::queue<InternetDatagram> datagrams_sent_ {}; // change queue to instead be able to map ip address to datagram 
+  std::map<uint32_t,InternetDatagram> datagrams_sent_ {};
+
+  std::map<uint32_t,eaddrtime> mapping {}; // add structure to check for time 
+  int time = 0;
+  Address last_arp = ip_address_;
 };
