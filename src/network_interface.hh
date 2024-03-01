@@ -1,7 +1,7 @@
 #pragma once
 
-#include <queue>
 #include <map>
+#include <queue>
 
 #include "address.hh"
 #include "ethernet_frame.hh"
@@ -69,8 +69,15 @@ public:
 
 private:
   // Human-readable name of the interface
-  struct eaddrtime {
-    int time;
+  struct dgramwtime
+  {
+    uint64_t time;
+    InternetDatagram dgram;
+  };
+
+  struct eaddrwtime
+  {
+    uint64_t time;
     EthernetAddress eaddr;
   };
 
@@ -89,10 +96,8 @@ private:
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
 
-  // std::queue<InternetDatagram> datagrams_sent_ {}; // change queue to instead be able to map ip address to datagram 
-  std::map<uint32_t,InternetDatagram> datagrams_sent_ {};
+  std::map<uint32_t, dgramwtime> datagrams_sent_ {};
 
-  std::map<uint32_t,eaddrtime> mapping {}; // add structure to check for time 
-  int time = 0;
-  Address last_arp = ip_address_;
+  std::map<uint32_t, eaddrwtime> mapping {};
+  uint64_t time = 0;
 };

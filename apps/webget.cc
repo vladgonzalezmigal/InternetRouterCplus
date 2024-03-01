@@ -20,7 +20,7 @@ void get_URL( const string& host, const string& path )
     cout << newBuf;
   }
   mySocket.wait_until_closed();
-  mySocket.shutdown(2);
+  mySocket.shutdown( 2 );
 }
 
 int main( int argc, char* argv[] )

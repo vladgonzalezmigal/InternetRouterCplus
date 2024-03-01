@@ -29,74 +29,61 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
 {
   uint32_t IPaddr = next_hop.ipv4_numeric();
   EthernetFrame frame;
-  EthernetHeader frameHeader;
-  frameHeader.src = ethernet_address_;
-  if (mapping.find(IPaddr) != mapping.end() ) { // dest ethernet addr is already known
-    frameHeader.type = EthernetHeader::TYPE_IPv4;
-    frameHeader.dst = mapping[IPaddr].eaddr;
-    frame.header = frameHeader;
-    frame.payload = serialize(dgram);
-    transmit(frame);
+  frame.header.src = ethernet_address_;
 
-  // pop queue
-  } else if (last_arp != next_hop || time > 5000 ) { // broadcoast an ARP request // do modulo division for time
-    ARPMessage myARP; 
-    myARP.opcode = ARPMessage::OPCODE_REQUEST;
-    myARP.sender_ip_address = ip_address_.ipv4_numeric(),myARP.sender_ethernet_address = ethernet_address_;
-    myARP.target_ip_address = IPaddr;
-    frameHeader.dst = ETHERNET_BROADCAST;
-    frame.payload = serialize(myARP);
-    frameHeader.type = EthernetHeader::TYPE_ARP;
-    frame.header = frameHeader;
-    datagrams_sent_[IPaddr] = dgram;   // queue datagram 
-    last_arp = next_hop;
-    time = 0;
-    transmit(frame);
-    }
-  
-  // don't flood ARP 
-  
-
+  if ( mapping.find( IPaddr ) != mapping.end() ) { // dest ethernet addr is already known
+    frame.header.type = EthernetHeader::TYPE_IPv4;
+    frame.header.dst = mapping[IPaddr].eaddr;
+    frame.payload = serialize( dgram );
+    transmit( frame );
+  } else if ( ( datagrams_sent_.find( IPaddr ) == datagrams_sent_.end() )
+              || datagrams_sent_[IPaddr].time < time ) { // make sure not flooding network
+    ARPMessage myARP { .opcode = ARPMessage::OPCODE_REQUEST,
+                       .sender_ethernet_address = ethernet_address_,
+                       .sender_ip_address = ip_address_.ipv4_numeric(),
+                       .target_ip_address = IPaddr };
+    frame.payload = serialize( myARP );
+    frame.header.type = EthernetHeader::TYPE_ARP;
+    frame.header.dst = ETHERNET_BROADCAST;
+    dgramwtime qdgram { time + static_cast<uint64_t>( 5000 ), dgram };
+    datagrams_sent_[IPaddr] = qdgram; // queue datagram
+    transmit( frame );
+  }
 }
 
 //! \param[in] frame the incoming Ethernet frame
 void NetworkInterface::recv_frame( const EthernetFrame& frame )
 {
-  // Your code here.
-  if (frame.header.dst == ETHERNET_BROADCAST || frame.header.dst == ethernet_address_){
-    if (frame.header.type == EthernetHeader::TYPE_IPv4){
-      InternetDatagram mydg;
-      bool success = parse(mydg, frame.payload);
-      if (success){
-        datagrams_received_.push(mydg);
-      }
-    } else {
-      // parse 
-      ARPMessage inboundARP;
-      bool success = parse(inboundARP, frame.payload);
-      if (success){
-        eaddrtime myInstance{time, inboundARP.sender_ethernet_address};
-        mapping[inboundARP.sender_ip_address] = myInstance;
-        if (inboundARP.opcode == ARPMessage::OPCODE_REPLY ){ // what happens if I get the reply for the 2nd one b4 the first, should I do nothing as I am waiting for the second one
-          if (datagrams_sent_.find(inboundARP.sender_ip_address) != datagrams_sent_.end()){
-            send_datagram(datagrams_sent_[inboundARP.sender_ip_address], Address::from_ipv4_numeric(inboundARP.sender_ip_address) );
-          }
-        }        
-        if (inboundARP.opcode == ARPMessage::OPCODE_REQUEST && inboundARP.target_ip_address == ip_address_.ipv4_numeric()){
-          EthernetFrame outframe;
-          EthernetHeader frameHeader;
-          ARPMessage outboundARP;
-          outboundARP.opcode = ARPMessage::OPCODE_REPLY;
-          outboundARP.sender_ip_address = ip_address_.ipv4_numeric(),outboundARP.sender_ethernet_address = ethernet_address_;
-          outboundARP.target_ip_address = inboundARP.sender_ip_address, outboundARP.target_ethernet_address = inboundARP.sender_ethernet_address;
-          outframe.payload = serialize(outboundARP);
-          frameHeader.type = EthernetHeader::TYPE_ARP;
-          frameHeader.dst = inboundARP.sender_ethernet_address;
-          frameHeader.src = ethernet_address_;
-          outframe.header = frameHeader;
-          transmit(outframe);
-        }
-      }
+  if ( frame.header.dst != ETHERNET_BROADCAST
+       && frame.header.dst != ethernet_address_ ) { // ignore any frames not destined for net interface
+    return;
+  } else if ( frame.header.type == EthernetHeader::TYPE_IPv4 ) {
+    InternetDatagram dgram;
+    parse( dgram, frame.payload ) ? datagrams_received_.push( dgram ) : void();
+  } else {
+    ARPMessage recARP;
+    if ( !parse( recARP, frame.payload ) ) {
+      return;
+    }
+    eaddrwtime eaddr { time + static_cast<uint64_t>( 30000 ), recARP.sender_ethernet_address };
+    mapping[recARP.sender_ip_address] = eaddr; // learn ip to ethernet mappings
+
+    if ( recARP.opcode == ARPMessage::OPCODE_REQUEST
+         && recARP.target_ip_address == ip_address_.ipv4_numeric() ) { // request asking for our ip addr
+      ARPMessage sendARP { .opcode = ARPMessage::OPCODE_REPLY,
+                           .sender_ethernet_address = ethernet_address_,
+                           .sender_ip_address = ip_address_.ipv4_numeric(),
+                           .target_ethernet_address = recARP.sender_ethernet_address,
+                           .target_ip_address = recARP.sender_ip_address };
+      EthernetFrame replyframe { .payload = serialize( sendARP ) };
+      replyframe.header.type = EthernetHeader::TYPE_ARP;
+      replyframe.header.dst = recARP.sender_ethernet_address, replyframe.header.src = ethernet_address_;
+      transmit( replyframe );
+    } else if ( datagrams_sent_.find( recARP.sender_ip_address )
+                != datagrams_sent_.end() ) { // reply is within our dg queue
+      send_datagram( datagrams_sent_[recARP.sender_ip_address].dgram,
+                     Address::from_ipv4_numeric( recARP.sender_ip_address ) );
+      datagrams_sent_.erase( recARP.sender_ip_address );
     }
   }
 }
@@ -105,13 +92,13 @@ void NetworkInterface::recv_frame( const EthernetFrame& frame )
 void NetworkInterface::tick( const size_t ms_since_last_tick )
 {
   time += ms_since_last_tick;
-  if (time >= 30000 && !mapping.empty()){
-    for (auto it = mapping.begin(); it != mapping.end();) {
-        if (it->second.time + 30000 <= time ) {
-            it = mapping.erase(it); // Delete the element and advance the iterator
-        } else {
-            ++it; // Move to the next element
-        }
+  if ( time >= 30000 && !mapping.empty() ) {
+    for ( auto it = mapping.begin(); it != mapping.end(); ) {
+      if ( it->second.time <= time ) { // check if 30 seconds have expired
+        it = mapping.erase( it );      // Delete the element and advance the iterator
+      } else {
+        ++it;
+      }
     }
   }
 }

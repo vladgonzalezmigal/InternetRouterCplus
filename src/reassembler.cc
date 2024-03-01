@@ -8,7 +8,8 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 {
   long unsigned int max_index = cur_index + writer().available_capacity();
   if ( max_index > cur_index + unassembled_buf.length() ) { // need to change this
-    unassembled_buf += std::string( ( max_index - ( cur_index + unassembled_buf.length() ) ), ' ' ); // can remove these lines with resize
+    unassembled_buf += std::string( ( max_index - ( cur_index + unassembled_buf.length() ) ),
+                                    ' ' ); // can remove these lines with resize
     string_bmap += std::string( ( max_index - ( cur_index + string_bmap.length() ) ), '0' );
   }
   if ( first_index < cur_index
@@ -26,7 +27,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     string_bmap.erase( 0, std::min( data.length(), writer().available_capacity() ) );
 
     unsigned long count = 0;
-    while (string_bmap[count] != '0' && count < string_bmap.length()){
+    while ( string_bmap[count] != '0' && count < string_bmap.length() ) {
       cur_index++;
       count++;
     }
@@ -36,7 +37,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     string_bmap.erase( 0, count );
     output_.writer().push( data );
 
-  } else if ( (first_index > cur_index) && (first_index < max_index) ) { // add bytes to buffer
+  } else if ( ( first_index > cur_index ) && ( first_index < max_index ) ) { // add bytes to buffer
     long unsigned int start_inx = first_index - cur_index;
     if ( start_inx + data.length() > max_index ) { // if the string is too long clip the end
       data.erase( ( max_index - start_inx ) );
