@@ -20,11 +20,29 @@ void Router::add_route( const uint32_t route_prefix,
        << static_cast<int>( prefix_length ) << " => " << ( next_hop.has_value() ? next_hop->ip() : "(direct)" )
        << " on interface " << interface_num << "\n";
 
-  // Your code here.
+  myRoute route {
+    .route_prefix = route_prefix, 
+    .prefix_length = prefix_length,
+    .next_hop = next_hop, 
+    .interface_num = interface_num
+  };
+  route_table.push_back(route);
 }
 
 // Go through all the interfaces, and route every incoming datagram to its proper outgoing interface.
 void Router::route()
 {
-  // Your code here.
+  for (std::shared_ptr<NetworkInterface> interface : _interfaces){
+    std::queue dgram_q = interface->datagrams_received();
+    while (!dgram_q.empty()){ // route dgrams in interface
+      if (dgram_q.front().header.ttl > 1){
+        uint32_t dest_addr = dgram_q.front().header.dst;
+        optional<myRoute> match;
+        for (myRoute route : route_table){
+          
+        }
+      }
+      //  void send_datagram( const InternetDatagram& dgram, const Address& next_hop )
+    }
+  }
 }

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <optional>
+#include <vector>
 
 #include "exception.hh"
 #include "network_interface.hh"
@@ -34,5 +35,12 @@ public:
 
 private:
   // The router's collection of network interfaces
+  struct myRoute{
+    uint32_t route_prefix;
+    uint8_t prefix_length;
+    std::optional<Address> next_hop;
+    size_t interface_num;
+  };
   std::vector<std::shared_ptr<NetworkInterface>> _interfaces {};
+  std::vector<myRoute> route_table {};
 };
