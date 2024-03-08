@@ -59,6 +59,11 @@ void NetworkInterface::recv_frame( const EthernetFrame& frame )
     return;
   } else if ( frame.header.type == EthernetHeader::TYPE_IPv4 ) {
     InternetDatagram dgram;
+    // if (  parse( dgram, frame.payload ) ){
+    //   datagrams_received_.push( dgram );
+    // } else {
+    //   return;
+    // }
     parse( dgram, frame.payload ) ? datagrams_received_.push( dgram ) : void();
   } else {
     ARPMessage recARP;
