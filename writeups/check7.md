@@ -7,7 +7,7 @@ My SUNet ID: [vladgm24]
 
 I collaborated with: [list sunetids here]
 
-I would like to thank/reward these classmates for their help: [moserj]
+I would like to thank/reward these classmates for their help: [moserj, siwooahn]
 
 This checkpoint took me about [2] hours to do. I [did] attend the lab session.
 
@@ -21,7 +21,7 @@ Solo portion:
 
 Group portion:
 
-- Who is your lab partner Joseph Moser, moerj?
+- Who is your lab partner moserj & siwooahn ?
 
 - Did your implementations successfully start and end a conversation with each other (with each implementation acting as ``client'' or as ``server'')? My implementation worked as both a client and a server.
 
