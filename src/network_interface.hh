@@ -71,14 +71,14 @@ private:
   // Human-readable name of the interface
   struct dgramwtime
   {
-    uint64_t time = 0;
-    InternetDatagram dgram = {};
+    uint64_t time {};
+    InternetDatagram dgram {};
   };
 
   struct eaddrwtime
   {
-    uint64_t time = 0;
-    EthernetAddress eaddr = {};
+    uint64_t time {};
+    EthernetAddress eaddr {};
   };
 
   std::string name_;
